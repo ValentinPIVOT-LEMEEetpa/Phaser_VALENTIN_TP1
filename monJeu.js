@@ -32,7 +32,7 @@ function preload(){
 	this.load.image('etoile','assets/star.png');
 	this.load.image('sol','assets/platform.png');
 	this.load.image('bomb','assets/bomb.png');
-	this.load.spritesheet('perso','assets/blabla.png',{frameWidth: 37, frameHeight: 26});
+	this.load.spritesheet('perso','assets/blabla.png',{frameWidth: 38, frameHeight: 26});
 }
 
 
@@ -41,29 +41,28 @@ function create(){
 	this.add.image(400,300,'background');
 
 	platforms = this.physics.add.staticGroup();
-	platforms.create(400,568,'sol').setScale(2).refreshBody();
-	platforms.create(600,400,'sol');
-	platforms.create(50,250,'sol');
-	platforms.create(60,600,'sol');
-	platforms.create(185,600,'sol');
-	platforms.create(300,600,'sol');
-	platforms.create(410,600,'sol');
-	platforms.create(520,600,'sol');
-	platforms.create(630,600,'sol');
-	platforms.create(740,600,'sol');
+	platforms.create(400,580,'sol').setScale(2).refreshBody();
+	platforms.create(600,400,'sol').refreshBody();
+	platforms.create(50,250,'sol').refreshBody();
+
+	platforms.create(60,600,'sol').refreshBody();
+	platforms.create(185,600,'sol').refreshBody();
+	platforms.create(300,600,'sol').refreshBody();
+	platforms.create(410,600,'sol').refreshBody();
+	platforms.create(520,600,'sol').refreshBody();
+	platforms.create(630,600,'sol').refreshBody();
+	platforms.create(740,600,'sol').refreshBody();
 
 	
 	player = this.physics.add.sprite(100,450,'perso');
 	player.setCollideWorldBounds(true);
-	player.setBounce(0.2);
-	player.body.setGravityY(000);
 	this.physics.add.collider(player,platforms);
 	
 	cursors = this.input.keyboard.createCursorKeys(); 
 	
 	this.anims.create({
 		key:'left',
-		frames: this.anims.generateFrameNumbers('perso', {start: 0, end: 3}),
+		frames: this.anims.generateFrameNumbers('perso', {start: 0, end: 8}),
 		frameRate: 10,
 		repeat: -1
 	});
@@ -74,6 +73,7 @@ function create(){
 		frameRate: 20
 	});
 	
+
 	stars = this.physics.add.group({
 		key: 'etoile',
 		repeat:11,
@@ -117,6 +117,7 @@ function hitBomb(player, bomb){
 	gameOver=true;
 }
 
+
 function collectStar(player, star){
 	star.disableBody(true,true);
 	score += 10;
@@ -129,9 +130,21 @@ function collectStar(player, star){
 		var x = (player.x < 400) ? 
 			Phaser.Math.Between(400,800):
 			Phaser.Math.Between(0,400);
-		var bomb = bombs.create(x, 16, 'bomb');
+		var bomb = bombs.create(y, 16, 'bomb');
 		bomb.setBounce(1);
 		bomb.setCollideWorldBounds(true);
+		bomb.setGravity(Phaser.Math.Between(-200, 200), 20);
 		bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
+
+
+		var y = (player.x < 400) ? 
+			Phaser.Math.Between(400,800):
+			Phaser.Math.Between(0,400);
+		var bomb = bombs.create(16, x, 'bomb');
+		bomb.setBounce(1);
+		bomb.setCollideWorldBounds(true);
+		bomb.setGravity(Phaser.Math.Between(-200, 200), 20);
+		bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
+
 	}
 }
