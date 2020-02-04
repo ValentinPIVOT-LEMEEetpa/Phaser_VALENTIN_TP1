@@ -32,7 +32,7 @@ function preload(){
 	this.load.image('etoile','assets/star.png');
 	this.load.image('sol','assets/platform.png');
 	this.load.image('bomb','assets/bomb.png');
-	this.load.spritesheet('perso','assets/blabla.png',{frameWidth: 32, frameHeight: 48});
+	this.load.spritesheet('perso','assets/blabla.png',{frameWidth: 37, frameHeight: 26});
 }
 
 
@@ -44,6 +44,14 @@ function create(){
 	platforms.create(400,568,'sol').setScale(2).refreshBody();
 	platforms.create(600,400,'sol');
 	platforms.create(50,250,'sol');
+	platforms.create(60,600,'sol');
+	platforms.create(185,600,'sol');
+	platforms.create(300,600,'sol');
+	platforms.create(410,600,'sol');
+	platforms.create(520,600,'sol');
+	platforms.create(630,600,'sol');
+	platforms.create(740,600,'sol');
+
 	
 	player = this.physics.add.sprite(100,450,'perso');
 	player.setCollideWorldBounds(true);
