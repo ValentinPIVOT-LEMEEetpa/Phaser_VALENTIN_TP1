@@ -24,11 +24,11 @@ var cursors;
 var stars;
 var scoreText;
 var bomb;
-
+var double_jump = 0;
 
 function preload(){
 	this.load.image('background','assets/sky.png');	
-	this.load.image('fond','assets/fond.png');
+	//this.load.image('fond','assets/fond.png');
 	this.load.image('etoile','assets/star.png');
 	this.load.image('sol','assets/platform.png');
 	this.load.image('bomb','assets/bomb.png');
@@ -105,9 +105,22 @@ function update(){
 		player.setVelocityX(0);
 	}
 	
-	if(cursors.up.isDown && player.body.touching.down){
-		player.setVelocityY(-330);
-	} 
+	if (player.body.touching.down)
+     // if player touch plateform, he gains his double jump
+          { var jump = 0;
+              }
+     
+    if (cursors.up.isDown &&  jump==0)
+          {
+        player.body.velocity.y = -330;
+              jump+1;
+      }
+  
+    if (cursors.up.isDown &&  jump==2 )
+          {
+        player.body.velocity.y = -330;
+                 jump=2;
+               }
 	
 }
 function hitBomb(player, bomb){
@@ -123,28 +136,32 @@ function collectStar(player, star){
 	score += 10;
 	scoreText.setText('score: '+score);
 	if(stars.countActive(true)===0){
-		stars.children.iterate(function(child){
-			child.enableBody(true,child.x,0, true, true);
-		});
-		
-		var x = (player.x < 400) ? 
-			Phaser.Math.Between(400,800):
-			Phaser.Math.Between(0,400);
-		var bomb = bombs.create(y, 16, 'bomb');
-		bomb.setBounce(1);
-		bomb.setCollideWorldBounds(true);
-		bomb.setGravity(Phaser.Math.Between(-200, 200), 20);
-		bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
+			stars.children.iterate(function(child){
+				child.enableBody(true,child.x,0, true, true);
+			});
+			
+		var value = Phaser.Math.Between(1, 2);
 
+		if(value == 1){
+			var x = (player.x < 400) ? 
+				Phaser.Math.Between(400,800):
+				Phaser.Math.Between(0,400);
+			var bomb = bombs.create(y, 16, 'bomb');
+			bomb.setBounce(1);
+			bomb.setCollideWorldBounds(true);
+			bomb.setGravity(Phaser.Math.Between(-200, 200), 20);
+			bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
+		}
 
-		var y = (player.x < 400) ? 
-			Phaser.Math.Between(400,800):
-			Phaser.Math.Between(0,400);
-		var bomb = bombs.create(16, x, 'bomb');
-		bomb.setBounce(1);
-		bomb.setCollideWorldBounds(true);
-		bomb.setGravity(Phaser.Math.Between(-200, 200), 20);
-		bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
-
+		if(value == 2){
+			var y = (player.y < 400) ? 
+				Phaser.Math.Between(400,800):
+				Phaser.Math.Between(0,400);
+			var bomb = bombs.create(16, x, 'bomb');
+			bomb.setBounce(1);
+			bomb.setCollideWorldBounds(true);
+			bomb.setGravity(Phaser.Math.Between(-200, 200), 20);
+			bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
+		}
 	}
 }
