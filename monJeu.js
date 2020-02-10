@@ -24,11 +24,14 @@ var cursors;
 var stars;
 var scoreText;
 var bomb;
-var double_jump = 0;
+var jump;
+
+
+
 
 function preload(){
 	this.load.image('background','assets/sky.png');	
-	//this.load.image('fond','assets/fond.png');
+	//this.load.image('fond','assets/fond.png');//
 	this.load.image('etoile','assets/star.png');
 	this.load.image('sol','assets/platform.png');
 	this.load.image('bomb','assets/bomb.png');
@@ -91,6 +94,11 @@ function create(){
 
 
 
+
+
+
+
+
 function update(){
 	if(cursors.left.isDown){
 		player.anims.play('left', true);
@@ -103,26 +111,14 @@ function update(){
 	}else{
 		player.anims.play('stop', true);
 		player.setVelocityX(0);
+	}if(cursors.up.isDown && player.body.touching.down){
+		
 	}
-	
-	if (player.body.touching.down)
-     // if player touch plateform, he gains his double jump
-          { var jump = 0;
-              }
-     
-    if (cursors.up.isDown &&  jump==0)
-          {
-        player.body.velocity.y = -330;
-              jump+1;
-      }
-  
-    if (cursors.up.isDown &&  jump==2 )
-          {
-        player.body.velocity.y = -330;
-                 jump=2;
-               }
-	
-}
+}	
+
+
+
+
 function hitBomb(player, bomb){
 	this.physics.pause();
 	player.setTint(0xff0000);
