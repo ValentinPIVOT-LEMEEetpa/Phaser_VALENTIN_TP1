@@ -92,23 +92,7 @@ function create(){
 	this.physics.add.collider(player,bombs, hitBomb, null, this);
 }
 
-function j_ump(){
-    if (player.body.touching.down) {
-        this.jumps = 2;
-        this.jumping = false;
-    }
 
-    if (this.jumps > 0 && !this.jumping == true && cursors.up.isDown) {
-        // Jump when the player is touching the ground and the up arrow is pressed
-        player.setVelocityY(-330);
-        this.jumping = true;
-    }
-    else if (cursors.up.isDown && this.jumping == true && player.body.touching.down) {
-    	alert('lol')
-        this.jumping = false;
-        this.jumps--;	
-    }
-};
 
 
 
@@ -125,9 +109,24 @@ function update(){
 	}else{
 		player.anims.play('stop', true);
 		player.setVelocityX(0);
-	}if(cursors.up.isDown && player.body.touching.down){
-		return j_ump();
-	}
+	}if(cursors.up.isDown && save_saut > 0 && save_touch == 1){
+        player.setVelocityY(-330);
+        save_saut -=1;
+        save_touch -=1;
+        if (save_saut == 1) {
+            player.setVelocityY(-250);
+        }
+        if (save_saut == 0) {
+            player.setVelocityY(-250);
+        }
+    }
+    if (cursors.up.isUp) {
+        save_touch = 1;
+    }
+    if (cursors.up.isUp && player.body.touching.down) {
+        save_saut = 2;
+
+    }
 }	
 
 
