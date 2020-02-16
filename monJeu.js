@@ -1,3 +1,4 @@
+
 var config = {
 	type: Phaser.AUTO,
 	width: 800,
@@ -17,6 +18,7 @@ scene: {
 };
 
 var game = new Phaser.Game(config);
+
 var score = 0;
 var platforms;
 var player;
@@ -29,6 +31,7 @@ var jump;
 
 
 
+
 function preload(){
 	this.load.image('background','assets/sky.png');	
 	//this.load.image('fond','assets/fond.png');//
@@ -36,6 +39,10 @@ function preload(){
 	this.load.image('sol','assets/platform.png');
 	this.load.image('bomb','assets/bomb.png');
 	this.load.spritesheet('perso','assets/blabla.png',{frameWidth: 38, frameHeight: 26});
+	this.load.spritesheet('atk','assets/atk.png',{frameWidth: 59, frameHeight: 58});
+	this.load.spritesheet('descand','assets/down.png',{frameWidth: 37, frameHeight: 29});
+
+
 }
 
 
@@ -60,6 +67,9 @@ function create(){
 	player = this.physics.add.sprite(100,450,'perso');
 	player.setCollideWorldBounds(true);
 	this.physics.add.collider(player,platforms);
+	this.physics.add.overlap(player,platforms);
+
+
 	
 	cursors = this.input.keyboard.createCursorKeys(); 
 	
@@ -76,6 +86,13 @@ function create(){
 		frameRate: 20
 	});
 	
+	this.anims.create({
+		key:'descand',
+		frames: this.anims.generateFrameNumbers('descand', {start: 0, end: 1}),
+		frameRate: 10,
+		repeat: 1
+	});
+
 
 	stars = this.physics.add.group({
 		key: 'etoile',
@@ -90,7 +107,9 @@ function create(){
 	bombs = this.physics.add.group();
 	this.physics.add.collider(bombs,platforms);
 	this.physics.add.collider(player,bombs, hitBomb, null, this);
+
 }
+
 
 
 
@@ -109,7 +128,9 @@ function update(){
 	}else{
 		player.anims.play('stop', true);
 		player.setVelocityX(0);
-	}if(cursors.up.isDown && save_saut > 0 && save_touch == 1){
+	}
+	//DOUBLE SAUT
+	if(cursors.up.isDown && save_saut > 0 && save_touch == 1){
         player.setVelocityY(-330);
         save_saut -=1;
         save_touch -=1;
@@ -125,6 +146,12 @@ function update(){
     }
     if (cursors.up.isUp && player.body.touching.down) {
         save_saut = 2;
+    }
+
+    //DESCENDRE D'UNE PLATEFORME
+    if(cursors.down.isDown){
+    	player.anims.play('descand',true);
+    	player.setVelocityY(350);
 
     }
 }	
