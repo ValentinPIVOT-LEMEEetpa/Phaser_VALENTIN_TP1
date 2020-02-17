@@ -187,7 +187,7 @@ function damage(amount) {
     {
         player.health = player.health - 25;
         //alert('amount ok');
-        
+		healthBar.scale.setTo(player.health / player.maxHealth, 1);        
 	}
            
     if (player.health <= 0)
@@ -208,7 +208,7 @@ function hitBomb(player, bomb){
 	return damage(25);
 	alert('damage ok');
 
-  	healthBar.scale.setTo( player.maxHealth / amount , 1);
+  	healthBar.scale.setTo( player.maxHealth / 25 , 1);
         alert('healthBar ok');
 	//player.anims.play('turn');
 
