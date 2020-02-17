@@ -1,4 +1,3 @@
-
 var config = {
 	type: Phaser.AUTO,
 	width: 800,
@@ -6,6 +5,7 @@ var config = {
 physics: {
         default: 'arcade',
         arcade: {
+        	//remettre la gravite a 300
             gravity: { y: 300 },
             debug: true
         }
@@ -18,7 +18,6 @@ scene: {
 };
 
 var game = new Phaser.Game(config);
-
 var score = 0;
 var platforms;
 var player;
@@ -27,6 +26,9 @@ var stars;
 var scoreText;
 var bomb;
 var jump;
+var healthBar;
+var health;
+var maxHealth;
 
 
 
@@ -41,7 +43,8 @@ function preload(){
 	this.load.spritesheet('perso','assets/blabla.png',{frameWidth: 38, frameHeight: 26});
 	this.load.spritesheet('atk','assets/atk.png',{frameWidth: 59, frameHeight: 58});
 	this.load.spritesheet('descand','assets/down.png',{frameWidth: 37, frameHeight: 29});
-
+	this.load.image('red-bar','assets/health-red.png');
+	this.load.image('green-bar','assets/health-green.png');
 
 }
 
@@ -63,11 +66,18 @@ function create(){
 	platforms.create(630,600,'sol').refreshBody();
 	platforms.create(740,600,'sol').refreshBody();
 
+	healths = this.physics.add.staticGroup();
+	healths.create(300, 20, 'red-bar');
+
+	healthBar = this.physics.add.staticGroup();
+	healthBar.create(300, 20, 'green-bar');
+
 	
 	player = this.physics.add.sprite(100,450,'perso');
 	player.setCollideWorldBounds(true);
 	this.physics.add.collider(player,platforms);
-	this.physics.add.overlap(player,platforms);
+	player.health = 100;
+	player.maxHealth = 100;
 
 
 	
@@ -104,14 +114,14 @@ function create(){
 	this.physics.add.overlap(player,stars,collectStar,null,this);
 
 	scoreText = this.add.text(16,16, 'score: 0', {fontSize: '32px', fill:'#000'});
+	healthText = this.add.text(210, 20, 'vie', {fontSize: '32px', fill:'#000'});
+	//game.add.create(300, 20, 'red-bar');
+
 	bombs = this.physics.add.group();
 	this.physics.add.collider(bombs,platforms);
-	this.physics.add.collider(player,bombs, hitBomb, null, this);
+	this.physics.add.collider(player, bombs, hitBomb, null, this);
 
 }
-
-
-
 
 
 
@@ -119,9 +129,11 @@ function create(){
 function update(){
 	if(cursors.left.isDown){
 		player.anims.play('left', true);
+		//remttre a 300
 		player.setVelocityX(-300);
 		player.setFlipX(false);
 	}else if(cursors.right.isDown){
+		//remttre a 300
 		player.setVelocityX(300);
 		player.anims.play('left', true);
 		player.setFlipX(true);
@@ -149,22 +161,60 @@ function update(){
     }
 
     //DESCENDRE D'UNE PLATEFORME
-    if(cursors.down.isDown){
+    if(cursors.down.isDown ){
     	player.anims.play('descand',true);
     	player.setVelocityY(350);
-
     }
 }	
 
+/*function setHealth (amount) {
 
+    player.health = amount;
+
+    if (player.health > player.maxHealth)
+    {
+        player.health = player.maxHealth;
+    }
+
+    return this;
+
+}
+*/
+
+function damage(amount) {
+	
+    if (player.health >= 1)
+    {
+        player.health = player.health - 25;
+        //alert('amount ok');
+        
+	}
+           
+    if (player.health <= 0)
+    {
+    	//this.kill();
+    	player.setTint(0xff0000);
+		//this.physics.pause()
+    	gameOver=true;
+    }
+   
+
+    return this;
+}
 
 
 function hitBomb(player, bomb){
-	this.physics.pause();
-	player.setTint(0xff0000);
-	player.anims.play('turn');
-	gameOver=true;
+
+	return damage(25);
+	alert('damage ok');
+
+  	healthBar.scale.setTo( player.maxHealth / amount , 1);
+        alert('healthBar ok');
+	//player.anims.play('turn');
+
+	
 }
+
 
 
 function collectStar(player, star){
