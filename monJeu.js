@@ -7,7 +7,7 @@ physics: {
         arcade: {
         	//remettre la gravite a 300
             gravity: { y: 300 },
-            debug: true
+            debug: false
         }
     },
 scene: {
@@ -54,9 +54,9 @@ function create(){
 	this.add.image(400,300,'background');
 
 	platforms = this.physics.add.staticGroup();
-	platforms.create(400,580,'sol').setScale(2).refreshBody();
+/*	platforms.create(400,580,'sol').setScale(2).refreshBody();
 	platforms.create(600,400,'sol').refreshBody();
-	platforms.create(50,250,'sol').refreshBody();
+	platforms.create(50,250,'sol').refreshBody();*/
 
 	platforms.create(60,600,'sol').refreshBody();
 	platforms.create(185,600,'sol').refreshBody();
@@ -66,11 +66,11 @@ function create(){
 	platforms.create(630,600,'sol').refreshBody();
 	platforms.create(740,600,'sol').refreshBody();
 
-	healths = this.physics.add.staticGroup();
+/*	healths = this.physics.add.staticGroup();
 	healths.create(300, 20, 'red-bar');
 
 	healthBar = this.physics.add.staticGroup();
-	healthBar.create(300, 20, 'green-bar');
+	healthBar.create(300, 20, 'green-bar');*/
 
 	
 	player = this.physics.add.sprite(100,450,'perso');
@@ -113,10 +113,17 @@ function create(){
 	this.physics.add.collider(stars,platforms);
 	this.physics.add.overlap(player,stars,collectStar,null,this);
 
-	scoreText = this.add.text(16,16, 'score: 0', {fontSize: '32px', fill:'#000'});
-	healthText = this.add.text(210, 20, 'vie', {fontSize: '32px', fill:'#000'});
-	//game.add.create(300, 20, 'red-bar');
+	scoreText = this.add.text(16,5, 'score:0', {fontSize: '30px', fill:'#000'});
+	
 
+
+	healthBar = this.physics.add.staticGroup();
+	healthBar.create(117, 50, 'green-bar');
+	redBar = this.physics.add.staticGroup();
+
+
+	healthText = this.add.text(30, 40, 'vie', {fontSize: '20px', fill:'#000'});
+	
 	bombs = this.physics.add.group();
 	this.physics.add.collider(bombs,platforms);
 	this.physics.add.collider(player, bombs, hitBomb, null, this);
@@ -167,52 +174,24 @@ function update(){
     }
 }	
 
-/*function setHealth (amount) {
 
-    player.health = amount;
 
-    if (player.health > player.maxHealth)
-    {
-        player.health = player.maxHealth;
-    }
 
-    return this;
+function hitBomb(player, bomb, healthBar, healths, health){
 
-}
-*/
-
-function damage(amount) {
+	player.health = player.health - 25;
 	
-    if (player.health >= 1)
-    {
-        player.health = player.health - 25;
-        //alert('amount ok');
-		healthBar.scale.setTo(player.health / player.maxHealth, 1);        
+	
+	redBar.create(-33 + (100 - player.health) * 2,40,'red-bar').setScale(0.25,1).setOrigin(0,0);
+
+	if(player.health <= 0){
+		player.setTint(0xff0000);
+		this.physics.pause();
+		gameOver=true;  
+		//player.anims.play('turn');
 	}
-           
-    if (player.health <= 0)
-    {
-    	//this.kill();
-    	player.setTint(0xff0000);
-		//this.physics.pause()
-    	gameOver=true;
-    }
-   
 
-    return this;
-}
-
-
-function hitBomb(player, bomb){
-
-	return damage(25);
-	alert('damage ok');
-
-  	healthBar.scale.setTo( player.maxHealth / 25 , 1);
-        alert('healthBar ok');
-	//player.anims.play('turn');
-
-	
+ 	
 }
 
 
