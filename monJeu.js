@@ -29,6 +29,7 @@ var jump;
 var healthBar;
 var health;
 var maxHealth;
+var keurs;
 
 
 
@@ -45,6 +46,7 @@ function preload(){
 	this.load.spritesheet('descand','assets/down.png',{frameWidth: 37, frameHeight: 29});
 	this.load.image('red-bar','assets/health-red.png');
 	this.load.image('green-bar','assets/health-green.png');
+	this.load.image('keur','assets/keur.png');
 
 }
 
@@ -54,9 +56,9 @@ function create(){
 	this.add.image(400,300,'background');
 
 	platforms = this.physics.add.staticGroup();
-/*	platforms.create(400,580,'sol').setScale(2).refreshBody();
+	platforms.create(400,580,'sol').setScale(2).refreshBody();
 	platforms.create(600,400,'sol').refreshBody();
-	platforms.create(50,250,'sol').refreshBody();*/
+	platforms.create(50,250,'sol').refreshBody();
 
 	platforms.create(60,600,'sol').refreshBody();
 	platforms.create(185,600,'sol').refreshBody();
@@ -79,7 +81,8 @@ function create(){
 	player.health = 100;
 	player.maxHealth = 100;
 
-
+/*	keurs = this.physics.add.staticGroup();
+	keurs.create(50,250,'keur').refreshBody();*/
 	
 	cursors = this.input.keyboard.createCursorKeys(); 
 	
@@ -109,12 +112,20 @@ function create(){
 		repeat:11,
 		setXY: {x:12,y:0,stepX:70}
 	});
+
+	keurs = this.physics.add.group({
+		key: 'keur',
+		repeat:0,
+		setXY: {x:600,y:0,stepX:70}
+	});
 	
 	this.physics.add.collider(stars,platforms);
 	this.physics.add.overlap(player,stars,collectStar,null,this);
 
 	scoreText = this.add.text(16,5, 'score:0', {fontSize: '30px', fill:'#000'});
 	
+	this.physics.add.collider(keurs,platforms);
+	this.physics.add.overlap(player,keurs,collectKeur,null,this);
 
 
 	healthBar = this.physics.add.staticGroup();
@@ -194,6 +205,10 @@ function hitBomb(player, bomb, healthBar, healths, health){
  	
 }
 
+function collectKeur(player, keur, healthBar, health){
+	keur.disableBody(true,true);
+	
+}
 
 
 function collectStar(player, star){
@@ -228,5 +243,10 @@ function collectStar(player, star){
 			bomb.setGravity(Phaser.Math.Between(-200, 200), 20);
 			bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
 		}
+	}
+	if(keurs.countActive(true)===0){
+			keurs.children.iterate(function(child){
+				child.enableBody(true,child.x,0, true, true);
+			});
 	}
 }
