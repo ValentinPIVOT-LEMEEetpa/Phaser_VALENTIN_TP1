@@ -7,7 +7,7 @@ physics: {
         arcade: {
         	//remettre la gravite a 300
             gravity: { y: 300 },
-            debug: true
+            debug: false
         }
     },
 scene: {
@@ -328,7 +328,7 @@ function tirer(player) {
 function hit (tir, stars) {
     tir.destroy();
     stars.destroy(); 
-    score += 10;
+    score += 20;
    	scoreText.setText('score: '+score);
 
 }
