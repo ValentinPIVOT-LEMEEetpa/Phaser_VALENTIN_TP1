@@ -29,7 +29,10 @@ var jump;
 var healthBar;
 var health;
 var maxHealth;
-var keurs;
+var montre;
+var v = 0;
+var g = 0;
+var b = 0;
 
 
 
@@ -46,7 +49,7 @@ function preload(){
 	this.load.spritesheet('descand','assets/down.png',{frameWidth: 37, frameHeight: 29});
 	this.load.image('red-bar','assets/health-red.png');
 	this.load.image('green-bar','assets/health-green.png');
-	this.load.image('keur','assets/keur.png');
+	this.load.image('montre','assets/watch.png');
 
 }
 
@@ -56,9 +59,9 @@ function create(){
 	this.add.image(400,300,'background');
 
 	platforms = this.physics.add.staticGroup();
-	platforms.create(400,580,'sol').setScale(2).refreshBody();
+/*	platforms.create(400,580,'sol').setScale(2).refreshBody();
 	platforms.create(600,400,'sol').refreshBody();
-	platforms.create(50,250,'sol').refreshBody();
+	platforms.create(50,250,'sol').refreshBody();*/
 
 	platforms.create(60,600,'sol').refreshBody();
 	platforms.create(185,600,'sol').refreshBody();
@@ -68,11 +71,7 @@ function create(){
 	platforms.create(630,600,'sol').refreshBody();
 	platforms.create(740,600,'sol').refreshBody();
 
-/*	healths = this.physics.add.staticGroup();
-	healths.create(300, 20, 'red-bar');
 
-	healthBar = this.physics.add.staticGroup();
-	healthBar.create(300, 20, 'green-bar');*/
 
 	
 	player = this.physics.add.sprite(100,450,'perso');
@@ -81,9 +80,7 @@ function create(){
 	player.health = 100;
 	player.maxHealth = 100;
 
-/*	keurs = this.physics.add.staticGroup();
-	keurs.create(50,250,'keur').refreshBody();*/
-	
+
 	cursors = this.input.keyboard.createCursorKeys(); 
 	
 	this.anims.create({
@@ -113,8 +110,8 @@ function create(){
 		setXY: {x:12,y:0,stepX:70}
 	});
 
-	keurs = this.physics.add.group({
-		key: 'keur',
+	montre = this.physics.add.group({
+		key: 'montre',
 		repeat:0,
 		setXY: {x:600,y:0,stepX:70}
 	});
@@ -124,8 +121,8 @@ function create(){
 
 	scoreText = this.add.text(16,5, 'score:0', {fontSize: '30px', fill:'#000'});
 	
-	this.physics.add.collider(keurs,platforms);
-	this.physics.add.overlap(player,keurs,collectKeur,null,this);
+	this.physics.add.collider(montre,platforms);
+	this.physics.add.overlap(player,montre,collectWatch,null,this);
 
 
 	healthBar = this.physics.add.staticGroup();
@@ -143,9 +140,58 @@ function create(){
 
 
 
+function collectWatch(player, montre){
+	montre.disableBody(true,true);
+
+	
+	var rdm = Phaser.Math.Between(1, 3);
+
+	if(rdm == 1){//gravity
+		g += 1;
+		v = 0;
+		b = 0;	
+	}
+	if(rdm == 2){//velocity
+		g = 0;
+		v += 1
+		b = 0;
+		
+	}
+	if(rdm == 3){//bounce
+		g = 0;
+		v = 0;
+		b += 1;
+	}
+
+	
+}
 
 function update(){
-	if(cursors.left.isDown){
+
+    if( g == 1){
+			player.setGravityY(-10000, 0);
+		}else{
+			player.setGravityY(300);
+		}
+
+	if(v == 1){
+		if(cursors.left.isDown){
+			player.anims.play('left', true);
+			//remttre a 300
+			player.setVelocityX(-3000);
+			player.setFlipX(false);
+		}else if(cursors.right.isDown){
+				//remttre a 300
+			player.setVelocityX(3000);
+			player.anims.play('left', true);
+			player.setFlipX(true);
+		}else{
+			player.anims.play('stop', true);
+			player.setVelocityX(0);
+		}
+	//alert('velocity')
+	}else{
+		if(cursors.left.isDown){
 		player.anims.play('left', true);
 		//remttre a 300
 		player.setVelocityX(-300);
@@ -159,6 +205,14 @@ function update(){
 		player.anims.play('stop', true);
 		player.setVelocityX(0);
 	}
+	}
+
+	if(b == 1){
+			player.setBounce(1);
+		}else{
+			player.setBounce(0);
+		}
+
 	//DOUBLE SAUT
 	if(cursors.up.isDown && save_saut > 0 && save_touch == 1){
         player.setVelocityY(-330);
@@ -205,10 +259,7 @@ function hitBomb(player, bomb, healthBar, healths, health){
  	
 }
 
-function collectKeur(player, keur, healthBar, health){
-	keur.disableBody(true,true);
-	
-}
+
 
 
 function collectStar(player, star){
@@ -244,8 +295,8 @@ function collectStar(player, star){
 			bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
 		}
 	}
-	if(keurs.countActive(true)===0){
-			keurs.children.iterate(function(child){
+	if(montre.countActive(true)===0){
+			montre.children.iterate(function(child){
 				child.enableBody(true,child.x,0, true, true);
 			});
 	}
