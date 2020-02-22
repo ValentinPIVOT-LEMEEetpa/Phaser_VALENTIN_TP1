@@ -7,7 +7,7 @@ physics: {
         arcade: {
         	//remettre la gravite a 300
             gravity: { y: 300 },
-            debug: false
+            debug: true
         }
     },
 scene: {
@@ -40,10 +40,6 @@ var groupeTir;
 var tire;
 var direction = 'left';
 
-
-
-
-
 function preload(){
 	this.load.image('background','assets/sky.png');	
 	//this.load.image('fond','assets/fond.png');//
@@ -57,7 +53,9 @@ function preload(){
 	this.load.image('green-bar','assets/health-green.png');
 	this.load.image('montre','assets/watch.png');
 	this.load.spritesheet('pig','assets/ennemi.png',{frameWidth: 38, frameHeight: 26});
+
 	this.load.image('tir','assets/shot.png');
+
 
 
 }
@@ -94,6 +92,7 @@ function create(){
 	ennemi.setCollideWorldBounds(true);
 	this.physics.add.collider(ennemi,platforms);
 	this.physics.add.collider(player, ennemi, hitPig, null, this);
+
 
 	cursors = this.input.keyboard.createCursorKeys();
 	tire = this.input.keyboard.addKey('A');
@@ -306,6 +305,7 @@ function update(){
 		}else{
 			ennemi.setBounce(1);
 		}
+
    ennemi.anims.play('gauche', true);
 
 
@@ -335,6 +335,17 @@ function hit (tir, stars) {
 
 
 function hitPig(player, ennemi, healthBar, healths, health){
+
+
+    
+
+   ennemi.anims.play('gauche', true);
+
+
+}	
+
+function hitPig(player, ennemi, healthBar, healths, health){
+
 
 	player.health = player.health - 50;
 	
