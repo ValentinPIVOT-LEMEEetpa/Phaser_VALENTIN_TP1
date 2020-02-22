@@ -36,6 +36,9 @@ var b = 0;
 var ve = 0;
 var ge = 0;
 var be = 0;
+var groupeTir;
+var tire;
+var direction = 'left';
 
 
 
@@ -54,6 +57,7 @@ function preload(){
 	this.load.image('green-bar','assets/health-green.png');
 	this.load.image('montre','assets/watch.png');
 	this.load.spritesheet('pig','assets/ennemi.png',{frameWidth: 38, frameHeight: 26});
+	this.load.image('tir','assets/shot.png');
 
 
 }
@@ -77,7 +81,7 @@ function create(){
 	platforms.create(630,600,'sol').refreshBody();
 	platforms.create(740,600,'sol').refreshBody();
 
-
+	
 
 	
 	player = this.physics.add.sprite(600,450,'perso');
@@ -91,8 +95,10 @@ function create(){
 	this.physics.add.collider(ennemi,platforms);
 	this.physics.add.collider(player, ennemi, hitPig, null, this);
 
+	cursors = this.input.keyboard.createCursorKeys();
+	tire = this.input.keyboard.addKey('A');
 
-	cursors = this.input.keyboard.createCursorKeys(); 
+	groupeTir = this.physics.add.group();
 	
 	this.anims.create({
 		key:'left',
@@ -133,7 +139,8 @@ function create(){
 		repeat:0,
 		setXY: {x:600,y:0,stepX:70}
 	});
-	
+
+
 	this.physics.add.collider(stars,platforms);
 	this.physics.add.overlap(player,stars,collectStar,null,this);
 
@@ -155,6 +162,9 @@ function create(){
 	bombs = this.physics.add.group();
 	this.physics.add.collider(bombs,platforms);
 	this.physics.add.collider(player, bombs, hitBomb, null, this);
+
+    this.physics.add.overlap(groupeTir, stars, hit, null,this);  
+
 
 }
 
@@ -232,19 +242,21 @@ function update(){
 
 	}else{
 		if(cursors.left.isDown){
-		player.anims.play('left', true);
-		//remttre a 300
-		player.setVelocityX(-300);
-		player.setFlipX(false);
-	}else if(cursors.right.isDown){
-		//remttre a 300
-		player.setVelocityX(300);
-		player.anims.play('left', true);
-		player.setFlipX(true);
-	}else{
-		player.anims.play('stop', true);
-		player.setVelocityX(0);
-	}
+			player.direction = 'left';
+			player.anims.play('left', true);
+			//remttre a 300
+			player.setVelocityX(-300);
+			player.setFlipX(false);
+		}else if(cursors.right.isDown){
+			player.direction = 'right'
+			//remttre a 300
+			player.setVelocityX(300);
+			player.anims.play('left', true);
+			player.setFlipX(true);
+		}else{
+			player.anims.play('stop', true);
+			player.setVelocityX(0);
+		}
 	}
 
 	if(b == 1){
@@ -294,12 +306,33 @@ function update(){
 		}else{
 			ennemi.setBounce(1);
 		}
-    
-
    ennemi.anims.play('gauche', true);
 
 
+	if ( Phaser.Input.Keyboard.JustDown(tire)) {
+		tirer(player, direction);
+	}
 }	
+
+function tirer(player) {
+	var coefDir;
+	    if (player.direction == 'left') { coefDir = -1; } else { coefDir = 1 }
+        // on crée la balle a coté du joueur
+        var tire = groupeTir.create(player.x + (25 * coefDir), player.y - 4, 'tir');
+        // parametres physiques de la balle.
+        tire.setCollideWorldBounds(false);
+        tire.body.allowGravity = false;
+        tire.setVelocity(1000 * coefDir, 0); // vitesse en x et en y
+}
+
+function hit (tir, stars) {
+    tir.destroy();
+    stars.destroy(); 
+    score += 10;
+   	scoreText.setText('score: '+score);
+
+}
+
 
 function hitPig(player, ennemi, healthBar, healths, health){
 
@@ -335,8 +368,6 @@ function hitBomb(player, bomb, healthBar, healths, health){
 
  	
 }
-
-
 
 
 function collectStar(player, star){
