@@ -7,7 +7,7 @@ physics: {
         arcade: {
         	//remettre la gravite a 300
             gravity: { y: 300 },
-            debug: false
+            debug: true
         }
     },
 scene: {
@@ -33,6 +33,9 @@ var montre;
 var v = 0;
 var g = 0;
 var b = 0;
+var ve = 0;
+var ge = 0;
+var be = 0;
 
 
 
@@ -50,6 +53,8 @@ function preload(){
 	this.load.image('red-bar','assets/health-red.png');
 	this.load.image('green-bar','assets/health-green.png');
 	this.load.image('montre','assets/watch.png');
+	this.load.spritesheet('pig','assets/ennemi.png',{frameWidth: 38, frameHeight: 26});
+
 
 }
 
@@ -59,9 +64,10 @@ function create(){
 	this.add.image(400,300,'background');
 
 	platforms = this.physics.add.staticGroup();
-/*	platforms.create(400,580,'sol').setScale(2).refreshBody();
+	platforms.create(400,580,'sol').setScale(2).refreshBody();
 	platforms.create(600,400,'sol').refreshBody();
-	platforms.create(50,250,'sol').refreshBody();*/
+	platforms.create(50,250,'sol').refreshBody();
+	platforms.create(600,250,'sol').setScale(0.2).refreshBody();
 
 	platforms.create(60,600,'sol').refreshBody();
 	platforms.create(185,600,'sol').refreshBody();
@@ -74,11 +80,16 @@ function create(){
 
 
 	
-	player = this.physics.add.sprite(100,450,'perso');
+	player = this.physics.add.sprite(600,450,'perso');
 	player.setCollideWorldBounds(true);
 	this.physics.add.collider(player,platforms);
 	player.health = 100;
 	player.maxHealth = 100;
+
+	ennemi = this.physics.add.sprite(50,600,'pig');
+	ennemi.setCollideWorldBounds(true);
+	this.physics.add.collider(ennemi,platforms);
+	this.physics.add.collider(player, ennemi, hitPig, null, this);
 
 
 	cursors = this.input.keyboard.createCursorKeys(); 
@@ -89,10 +100,17 @@ function create(){
 		frameRate: 10,
 		repeat: -1
 	});
+
+	this.anims.create({
+		key:'gauche',
+		frames: this.anims.generateFrameNumbers('pig', {start: 0, end: 6}),
+		frameRate: 10,
+		repeat: -1
+	});
 	
 	this.anims.create({
 		key:'stop',
-		frames: [{key: 'perso', frame:4}],
+		frames: [{key: 'perso', frame:3}],
 		frameRate: 20
 	});
 	
@@ -120,9 +138,11 @@ function create(){
 	this.physics.add.overlap(player,stars,collectStar,null,this);
 
 	scoreText = this.add.text(16,5, 'score:0', {fontSize: '30px', fill:'#000'});
-	
+
+
 	this.physics.add.collider(montre,platforms);
 	this.physics.add.overlap(player,montre,collectWatch,null,this);
+	this.physics.add.overlap(ennemi,montre,collectWatchEnnemi,null,this);
 
 
 	healthBar = this.physics.add.staticGroup();
@@ -161,6 +181,25 @@ function collectWatch(player, montre){
 		g = 0;
 		v = 0;
 		b += 1;
+	}	
+}
+
+function collectWatchEnnemi(ennemi, montre){
+	montre.disableBody(true,true);
+
+	
+	var rdme = Phaser.Math.Between(1, 2);
+
+	if(rdme == 1){//gravity
+		ge += 1;
+		ve = 0;
+		be = 0;		
+	}
+
+	if(rdme == 2){//bounce
+		ge = 0;
+		ve = 0;
+		be += 1;
 	}
 
 	
@@ -168,6 +207,7 @@ function collectWatch(player, montre){
 
 function update(){
 
+	//aleatoire
     if( g == 1){
 			player.setGravityY(-10000, 0);
 		}else{
@@ -178,18 +218,18 @@ function update(){
 		if(cursors.left.isDown){
 			player.anims.play('left', true);
 			//remttre a 300
-			player.setVelocityX(-3000);
+			player.setVelocityX(-500);
 			player.setFlipX(false);
 		}else if(cursors.right.isDown){
 				//remttre a 300
-			player.setVelocityX(3000);
+			player.setVelocityX(500);
 			player.anims.play('left', true);
 			player.setFlipX(true);
 		}else{
 			player.anims.play('stop', true);
 			player.setVelocityX(0);
 		}
-	//alert('velocity')
+
 	}else{
 		if(cursors.left.isDown){
 		player.anims.play('left', true);
@@ -213,16 +253,18 @@ function update(){
 			player.setBounce(0);
 		}
 
+
+
 	//DOUBLE SAUT
 	if(cursors.up.isDown && save_saut > 0 && save_touch == 1){
-        player.setVelocityY(-330);
+        player.setVelocityY(-400);
         save_saut -=1;
         save_touch -=1;
         if (save_saut == 1) {
-            player.setVelocityY(-250);
+            player.setVelocityY(-350);
         }
         if (save_saut == 0) {
-            player.setVelocityY(-250);
+            player.setVelocityY(-350);
         }
     }
     if (cursors.up.isUp) {
@@ -232,14 +274,49 @@ function update(){
         save_saut = 2;
     }
 
-    //DESCENDRE D'UNE PLATEFORME
+    //DESCENDRE PLUS VITE
     if(cursors.down.isDown ){
     	player.anims.play('descand',true);
     	player.setVelocityY(350);
     }
+
+
+    //aleatoire ennemi
+    if( ge == 1){
+			ennemi.setGravityY(10000, 0);
+		}else{
+			ennemi.setGravityX(350);
+   			ennemi.setGravityY(-350);
+		}
+
+	if(be == 1){
+			ennemi.setBounce(1.25);
+		}else{
+			ennemi.setBounce(1);
+		}
+    
+
+   ennemi.anims.play('gauche', true);
+
+
 }	
 
+function hitPig(player, ennemi, healthBar, healths, health){
 
+	player.health = player.health - 50;
+	
+	
+	redBar.create(-83 + (100 - player.health) * 2,40,'red-bar').setScale(0.5,1).setOrigin(0,0);
+
+	if(player.health <= 0){
+		player.setTint(0xff0000);
+		this.physics.pause();
+		gameOver=true;  
+		//player.anims.play('turn');
+	}
+
+ 	
+}
 
 
 function hitBomb(player, bomb, healthBar, healths, health){
