@@ -40,6 +40,7 @@ var groupeTir;
 var tire;
 var direction = 'left';
 var texte;
+var bestScore = 0;
 
 function preload(){
 	this.load.image('background','assets/sky.png');	
@@ -56,6 +57,7 @@ function preload(){
 	this.load.spritesheet('pig','assets/ennemi.png',{frameWidth: 38, frameHeight: 26});
 	this.load.image('tir','assets/shot.png');
 	this.load.image('titre','assets/preload.png');
+	this.load.image('endgame','assets/GAMEOVER.png');
 
 }
 
@@ -78,13 +80,14 @@ function create(){
 	this.physics.add.collider(player,platforms);
 	player.health = 100;
 	player.maxHealth = 100;
-	ennemi = this.physics.add.sprite(50,600,'pig');
+	ennemi = this.physics.add.sprite(50,590,'pig');
 	ennemi.setCollideWorldBounds(true);
 	this.physics.add.collider(ennemi,platforms);
 	this.physics.add.collider(player, ennemi, hitPig, null, this);
 	cursors = this.input.keyboard.createCursorKeys();
 	tire = this.input.keyboard.addKey('A');
 	ecranTitre = this.input.keyboard.addKey('X');
+	ecranFin = this.input.keyboard.addKey('R');
 	this.input.mouse.capture = true;
 	groupeTir = this.physics.add.group();
 	this.anims.create({
@@ -123,6 +126,7 @@ function create(){
 	this.physics.add.collider(stars,platforms);
 	this.physics.add.overlap(player,stars,collectStar,null,this);
 	scoreText = this.add.text(16,5, 'score:0', {fontSize: '30px', fill:'#000'});
+	bestScoreText = this.add.text(560,5, 'Meilleur score:0', {fontSize: '20px', fill:'#000'});
 	rdmText = this.add.text(16,70, 'effets: rien', {fontSize: '20px', fill:'#000'});
 	this.physics.add.collider(montre,platforms);
 	this.physics.add.overlap(player,montre,collectWatch,null,this);
@@ -135,6 +139,8 @@ function create(){
 	this.physics.add.collider(bombs,platforms);
 	this.physics.add.collider(player, bombs, hitBomb, null, this);
     this.physics.add.overlap(groupeTir, stars, hit, null,this);  
+	ecranDeFin = this.physics.add.sprite(400,300,'endgame');
+	ecranDeFin.setCollideWorldBounds(true);
 	ecranDeTitre = this.physics.add.sprite(400,300,'titre');
 	ecranDeTitre.setCollideWorldBounds(true);
 }
@@ -176,6 +182,7 @@ function collectWatchEnnemi(ennemi, montre){
 }
 
 function update(){
+	
 	//aleatoire
     if( g == 1){
 			player.setGravityY(-10000, 0);
@@ -262,11 +269,35 @@ function update(){
 			ennemi.setBounce(1);
 		}
    ennemi.anims.play('gauche', true);
+   	//tir du personnage
 	if ( Phaser.Input.Keyboard.JustDown(tire)) {
 		tirer(player, direction);
 	}	
+	//start
 	if ( Phaser.Input.Keyboard.JustDown(ecranTitre)) {
 		ecranDeTitre.setActive(false).setVisible(false);
+		ecranDeFin.setActive(false).setVisible(false);
+	}
+	//restart
+	if ( Phaser.Input.Keyboard.JustDown(ecranFin)){
+		ecranDeFin.setActive(false).setVisible(false);
+		 console.log('restart');
+    	this.scene.restart();
+    	this.bestScore = score;
+    	rmd = 0;
+    	rdme = 0;
+    	ge = 0;
+		ve = 0;
+		be = 0;
+		g = 0;
+		v = 0;
+		b = 0;
+		score = 0;
+	}
+	//meileur score
+	if(score > bestScore){
+		bestScore = score
+		bestScoreText.setText('Meilleur score: '+bestScore);
 	}
 }
 
@@ -284,6 +315,7 @@ function hit (tir, stars) {
     stars.setActive(false).setVisible(false); 
     score += 20;
    	scoreText.setText('score: '+score);
+   	bestScoreText.setText('Meilleur score: '+bestScore);
 
 }
 
@@ -297,7 +329,9 @@ function hitPig(player, ennemi, healthBar, healths, health){
 	if(player.health <= 0){
 		player.setTint(0xff0000);
 		this.physics.pause();
-		gameOver=true;  
+		gameOver=true;
+		ecranDeFin.setActive(true).setVisible(true);
+
 	}	
 }
 
@@ -307,7 +341,8 @@ function hitBomb(player, bomb, healthBar, healths, health){
 	if(player.health <= 0){
 		player.setTint(0xff0000);
 		this.physics.pause();
-		gameOver=true;  
+		gameOver=true;
+		ecranDeFin.setActive(true).setVisible(true);
 	}	
 }
 
@@ -315,6 +350,7 @@ function collectStar(player, star){
 	star.disableBody(true,true);
 	score += 10;
 	scoreText.setText('score: '+score);
+	bestScoreText.setText('Meilleur score: '+bestScore);
 	if(stars.countActive(true)===0){
 			stars.children.iterate(function(child){
 				child.enableBody(true,child.x,0, true, true);
